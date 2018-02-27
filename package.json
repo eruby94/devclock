@@ -1,0 +1,28 @@
+{
+  "name": "devclock",
+  "version": "0.0.1",
+  "description": "Development time reporting tool",
+  "repository": "git@github.com:eruby94/devclock.git",
+  "author": "Evan Ruby <evanruby94@gmail.com>",
+  "license": "MIT",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src -d lib"
+  },
+  "bin": {
+    "devclock": "./bin/devclock.js"
+  },
+  "files": [
+    "lib",
+    "bin"
+  ],
+  "preferGlobal": true,
+  "dependencies": {
+    "moment-timezone": "^0.5.14"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
+  }
+}
