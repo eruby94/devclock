@@ -1,6 +1,6 @@
-const fs = require('fs')
-const os = require('os')
-const inquirer = require('inquirer')
+import fs from 'fs'
+import os from 'os'
+import inquirer from 'inquirer'
 
 if (!fs.existsSync(`${os.homedir()}/.devclock/`)) {
   fs.mkdir(`${os.homedir()}/.devclock`, (err) => {
