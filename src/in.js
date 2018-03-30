@@ -1,4 +1,16 @@
+import series from 'async/series'
+import { checkForUser, extractUser, adjustTimesheet } from './util'
+
 export default () => {
-  // TODO find the timesheet for the current project and add time in
-  console.log('Clocking in...')
+  const fnSeries = []
+  fnSeries.push((cb) => {
+    checkForUser(cb)
+  })
+  fnSeries.push((cb) => {
+    extractUser(cb)
+  })
+  series(fnSeries, (err, results) => {
+    if (err) throw err
+    adjustTimesheet(results[results.length - 1], true)
+  })
 }

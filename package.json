@@ -7,7 +7,8 @@
   "license": "MIT",
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src -d lib"
+    "build": "babel src -d lib",
+    "postinstall": "node ./lib/setup.js"
   },
   "bin": {
     "devclock": "./bin/devclock.js"
