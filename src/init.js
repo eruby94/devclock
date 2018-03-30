@@ -1,7 +1,14 @@
 import fs from 'fs'
+import os from 'os'
 import inquirer from 'inquirer'
 import series from 'async/series'
-import { timesheetExists, projectConfigExists, checkForUser, extractUser } from './util'
+import {
+  timesheetExists,
+  projectConfigExists,
+  rootConfigExists,
+  checkForUser,
+  extractUser,
+} from './util'
 
 const addUserToProject = (devUser) => {
   // Strip all whitespace from devUser
@@ -18,46 +25,61 @@ const addUserToProject = (devUser) => {
   }
 }
 
-export default () => {
-  const prompts = []
-  const fnSeries = []
-  // If no config is found
-  if (!projectConfigExists()) {
-    // Add devclock sheets to the .gitignore
-    // fs.appendFileSync(`${process.cwd()}/.gitignore`, '\n.*.devclock.json\n')
-    // Add prompt for the project name
-    prompts.push({
-      type: 'input',
-      name: 'title',
-      message: 'What is the name of this project? (e.g. My Project)',
-      default: 'My Project',
-    })
-    fnSeries.push((cb) => {
-      inquirer.prompt(prompts).then((answers) => {
-        // Write initial config to devclock.config.json
-        fs.writeFile(
-          `${process.cwd()}/devclock.config.json`,
-          JSON.stringify({ title: answers.title }, null, 2),
-          (err) => {
-            if (err) throw err
-            cb()
-          },
-        )
-      })
+const addProjectToList = (cb) => {
+  if (rootConfigExists()) {
+    const configPath = `${os.homedir()}/.devclock/projects.json`
+    // Extract existing project json
+    const { projectList } = JSON.parse(fs.readFileSync(configPath, { encoding: 'utf-8' }))
+    // Add current path to projectList as a string
+    projectList.push(`${process.cwd()}`)
+    fs.writeFile(configPath, JSON.stringify({ projectList }, null, 2), (err) => {
+      if (err) throw err
+      cb()
     })
   } else {
-    console.log('devclock config file exists')
+    console.log('Devclock has not yet been configured, please run devclock setup')
+    cb()
   }
-  // TODO add project path to root configuration
-  fnSeries.push((cb) => {
-    checkForUser(cb)
+}
+
+const promptForProjectName = (cb) => {
+  const prompts = []
+  prompts.push({
+    type: 'input',
+    name: 'title',
+    message: 'What is the name of this project? (e.g. My Project)',
+    default: 'My Project',
   })
-  fnSeries.push((cb) => {
-    extractUser(cb)
+  inquirer.prompt(prompts).then((answers) => {
+    // Write initial config to devclock.config.json
+    fs.writeFile(
+      `${process.cwd()}/devclock.config.json`,
+      JSON.stringify({ title: answers.title }, null, 2),
+      (err) => {
+        if (err) throw err
+        cb()
+      },
+    )
   })
-  series(fnSeries, (err, results) => {
-    if (err) throw err
-    addUserToProject(results[results.length - 1])
-    console.log('devclock successfully configured!')
-  })
+}
+
+export default () => {
+  series(
+    {
+      projectName: !projectConfigExists
+        ? promptForProjectName
+        : (cb) => {
+          console.log('devclock config file exists')
+          cb()
+        },
+      checkForUser,
+      user: extractUser,
+      addProjectToList,
+    },
+    (err, results) => {
+      if (err) throw err
+      addUserToProject(results.user)
+      console.log('devclock successfully configured!')
+    },
+  )
 }
