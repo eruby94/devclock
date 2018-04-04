@@ -14,4 +14,6 @@ if (command === 'in') {
   thisLib.init()
 } else if (command === 'setup') {
   thisLib.setup()
+} else if (command === 'analyze') {
+  thisLib.analyze()
 }

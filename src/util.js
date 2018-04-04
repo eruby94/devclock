@@ -2,6 +2,8 @@ import fs from 'fs'
 import os from 'os'
 import moment from 'moment-timezone'
 
+export const extractJSON = path => JSON.parse(fs.readFileSync(path, { encoding: 'utf-8' }))
+
 export const rootConfigExists = () => fs.existsSync(`${os.homedir()}/.devclock/`)
 
 export const projectConfigExists = () => fs.existsSync(`${process.cwd()}/devclock.config.json`)
@@ -20,7 +22,7 @@ export const checkForUser = (cb) => {
 }
 
 export const extractUser = (cb) => {
-  const dev = JSON.parse(fs.readFileSync(`${os.homedir()}/.devclock/dev.json`, { encoding: 'utf-8' }))
+  const dev = extractJSON(`${os.homedir()}/.devclock/dev.json`)
   cb(null, dev.fullName.replace(/\s+/g, ''))
 }
 
@@ -32,7 +34,7 @@ export const timesheetExists = devUser =>
 export const adjustTimesheet = (devUser, shouldClockIn) => {
   if (timesheetExists(devUser)) {
     // Extract timesheet json
-    const updatedTimesheet = JSON.parse(fs.readFileSync(getTimesheetPath(devUser), { encoding: 'utf-8' }))
+    const updatedTimesheet = extractJSON(getTimesheetPath(devUser))
     if (shouldClockIn) {
       const timeIn = moment()
       // Add new timesheet entry, with clock-out to match clock-in time.
@@ -59,3 +61,5 @@ export const adjustTimesheet = (devUser, shouldClockIn) => {
     console.log('User has not yet been added to the project, please run devclock init')
   }
 }
+
+export const getProjectListPath = () => `${os.homedir()}/.devclock/projects.json`

@@ -1,5 +1,4 @@
 import fs from 'fs'
-import os from 'os'
 import inquirer from 'inquirer'
 import series from 'async/series'
 import {
@@ -8,6 +7,7 @@ import {
   rootConfigExists,
   checkForUser,
   extractUser,
+  getProjectListPath,
 } from './util'
 
 const addUserToProject = (devUser) => {
@@ -27,12 +27,12 @@ const addUserToProject = (devUser) => {
 
 const addProjectToList = (cb) => {
   if (rootConfigExists()) {
-    const configPath = `${os.homedir()}/.devclock/projects.json`
+    const projectListPath = getProjectListPath()
     // Extract existing project json
-    const { projectList } = JSON.parse(fs.readFileSync(configPath, { encoding: 'utf-8' }))
+    const { projectList } = JSON.parse(fs.readFileSync(projectListPath, { encoding: 'utf-8' }))
     // Add current path to projectList as a string
     projectList.push(`${process.cwd()}`)
-    fs.writeFile(configPath, JSON.stringify({ projectList }, null, 2), (err) => {
+    fs.writeFile(projectListPath, JSON.stringify({ projectList }, null, 2), (err) => {
       if (err) throw err
       cb()
     })
