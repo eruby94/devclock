@@ -49,4 +49,4 @@ A 100% hackable time tracking tool and built with Node.js.
 
 ## Contributing
 
-* You are encouraged to fork that repo and make a Pull Request if there is something you would like to change / improve.
+* You are encouraged to fork this repo and make a Pull Request if there is something you would like to change / improve.
