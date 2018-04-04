@@ -14,10 +14,8 @@ A 100% hackable time tracking tool and built with Node.js.
 
   * Initializes a project for usage with devclock, specifically:
 
-    ```
-    	1. Creates a time sheet associated with each project
-    	2. Updates your root configuration files accordingly.
-    ```
+        1. Creates a time sheet associated with each project
+        2. Updates your root configuration files accordingly.
 
   * **Note:** Time sheet files are not gitignored by default so that reports may be batch-generated. It is strongly recommended that you allow for this functionality.
 
