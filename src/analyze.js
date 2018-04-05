@@ -1,4 +1,4 @@
-// import fs from 'fs'
+import fs from 'fs'
 import waterfall from 'async/waterfall'
 import moment from 'moment-timezone'
 import {
@@ -7,6 +7,8 @@ import {
   getProjectListPath,
   checkForUser,
   extractUser,
+  reportsDirExists,
+  getReportsDirPath,
 } from './util'
 
 const getBlockDuration = (entry) => {
@@ -52,10 +54,25 @@ const extractUserTimesheets = (user, cb) => {
   cb(null, timesheetData)
 }
 
+const saveReport = (reportJSON) => {
+  const destination = `${getReportsDirPath()}${moment().toISOString()}.json`
+  fs.writeFile(destination, reportJSON, (err) => {
+    if (err) throw err
+    console.log(`New report created at ${destination}`)
+  })
+}
+
 export default () => {
   waterfall([checkForUser, extractUser, extractUserTimesheets], (err, result) => {
     if (err) throw err
     // TODO allow for start day and end day to be passed as params for a report to be generated
-    console.log(JSON.stringify(result, null, 2))
+    if (reportsDirExists()) {
+      saveReport(JSON.stringify(result, null, 2))
+    } else {
+      fs.mkdir(getReportsDirPath(), (err2) => {
+        if (err2) throw err2
+        saveReport(JSON.stringify(result, null, 2))
+      })
+    }
   })
 }

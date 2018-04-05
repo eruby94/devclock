@@ -8,6 +8,10 @@ export const rootConfigExists = () => fs.existsSync(`${os.homedir()}/.devclock/`
 
 export const projectConfigExists = () => fs.existsSync(`${process.cwd()}/devclock.config.json`)
 
+export const getReportsDirPath = () => `${os.homedir()}/.devclock/reports/`
+
+export const reportsDirExists = () => fs.existsSync(getReportsDirPath())
+
 export const checkForUser = (cb) => {
   fs.open(`${os.homedir()}/.devclock/dev.json`, 'r', (err) => {
     if (err) {
@@ -28,8 +32,7 @@ export const extractUser = (cb) => {
 
 export const getTimesheetPath = devUser => `${process.cwd()}/.${devUser}.devclock.json`
 
-export const timesheetExists = devUser =>
-  fs.existsSync(`${process.cwd()}/.${devUser}.devclock.json`)
+export const timesheetExists = devUser => fs.existsSync(getTimesheetPath(devUser))
 
 export const adjustTimesheet = (devUser, shouldClockIn) => {
   if (timesheetExists(devUser)) {
